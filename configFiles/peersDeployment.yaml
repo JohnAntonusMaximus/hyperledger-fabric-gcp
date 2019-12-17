@@ -172,7 +172,19 @@ spec:
         - name: CORE_PEER_TLS_ENABLED
           value: "false"
         - name: CORE_LEDGER_STATE_STATEDATABASE
-          value: goleveldb
+          value: CouchDB
+        - name: CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS
+          value: cluster-svc-couchdb:5984
+        - name: CORE_LEDGER_STATE_COUCHDBCONFIG_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: cluster-couchdb
+              key: adminUsername
+        - name: CORE_LEDGER_STATE_COUCHDBCONFIG_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: cluster-couchdb
+              key: adminPassword
         - name: FABRIC_CFG_PATH
           value: /etc/hyperledger/fabric/
         - name: ORDERER_URL
@@ -258,7 +270,19 @@ spec:
         - name: CORE_PEER_TLS_ENABLED
           value: "false"
         - name: CORE_LEDGER_STATE_STATEDATABASE
-          value: goleveldb
+          value: CouchDB
+        - name: CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS
+          value: cluster-svc-couchdb:5984
+        - name: CORE_LEDGER_STATE_COUCHDBCONFIG_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: cluster-couchdb
+              key: adminUsername
+        - name: CORE_LEDGER_STATE_COUCHDBCONFIG_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: cluster-couchdb
+              key: adminPassword
         - name: FABRIC_CFG_PATH
           value: /etc/hyperledger/fabric/
         - name: ORDERER_URL
@@ -345,7 +369,19 @@ spec:
         - name: CORE_PEER_TLS_ENABLED
           value: "false"
         - name: CORE_LEDGER_STATE_STATEDATABASE
-          value: goleveldb
+          value: CouchDB
+        - name: CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS
+          value: cluster-svc-couchdb:5984
+        - name: CORE_LEDGER_STATE_COUCHDBCONFIG_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: cluster-couchdb
+              key: adminUsername
+        - name: CORE_LEDGER_STATE_COUCHDBCONFIG_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: cluster-couchdb
+              key: adminPassword
         - name: FABRIC_CFG_PATH
           value: /etc/hyperledger/fabric/
         - name: ORDERER_URL
@@ -432,7 +468,19 @@ spec:
         - name: CORE_PEER_TLS_ENABLED
           value: "false"
         - name: CORE_LEDGER_STATE_STATEDATABASE
-          value: goleveldb
+          value: CouchDB
+        - name: CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS
+          value: cluster-svc-couchdb:5984
+        - name: CORE_LEDGER_STATE_COUCHDBCONFIG_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: cluster-couchdb
+              key: adminUsername
+        - name: CORE_LEDGER_STATE_COUCHDBCONFIG_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: cluster-couchdb
+              key: adminPassword
         - name: FABRIC_CFG_PATH
           value: /etc/hyperledger/fabric/
         - name: ORDERER_URL
