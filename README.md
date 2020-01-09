@@ -117,7 +117,7 @@ Note: Your CI/CD system will need to have a service account activated with suffi
 ### Chaincode Deployer Continuous Integration/Deployment Instructions:
 We needed to create a way that allowed us to continuously deploy and upgrade chaincode in an enterprise setting, so we created a series of sequential Kubernetes jobs that automatically install, instantiates, and upgrades chaincode from a single script. 
 
-The Chaincode Deployer (chaincode_deployer directory) should be separated into its own repo if you're going to use it as your chaincode model. Then you can just use whatever CI/CD tooling you'd like to run the deploy.sh script in the chaincode_deployer directory. Below is a step by step usage guide, there is an example chaincode for a simple asset that you can run to test how it works. 
+The Chaincode Deployer (chaincode_deployer directory) should be separated into its own repo for each chaincode you plan to deploy (chaincode.go). Then you can just use whatever CI/CD tooling you'd like to run the deploy.sh script in the chaincode_deployer directory. Below is a step by step usage guide, there is an example chaincode for a simple asset that you can run to test how it works. 
 
 1) Write  your chaincode in 'chaincode_deployer/chaincode/' directory. All your code must be scoped to 'package main' or you will get $GOPATH errors in your peer when the install job runs.
 
