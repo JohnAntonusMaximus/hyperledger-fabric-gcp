@@ -7,6 +7,7 @@
 
 ## Created By:
 John Radosta - [KaizenTek](http://www.kaizentek.io)
+
 Benjamin Beckman - [Magic Leap](http://www.magicleap.com)
 
 ## Acknowledgements
