@@ -52,7 +52,7 @@ Change the CORE_LEDGER_STATE_STATEDATABASE environment variable to LevelDB for e
 
 ```
 - name: CORE_LEDGER_STATE_STATEDATABASE
-          value: LevelDB 
+  value: LevelDB 
 ```
 
 ## Organizations Configuration
@@ -82,16 +82,16 @@ $ ./deleteNetwork.sh
 
 After successful execution of the script `setup_blockchainNetwork.sh`, check the status of pods.
 
-  ```
-  $ kubectl get pods
-  NAME                                    READY     STATUS    RESTARTS   AGE
-  blockchain-ca-7848c48d64-2cxr5          1/1       Running   0          4m
-  blockchain-orderer-596ccc458f-thdgn     1/1       Running   0          4m
-  blockchain-org1peer1-747d6bdff4-4kzts   1/1       Running   0          4m
-  blockchain-org2peer1-7794d9b8c5-sn2qf   1/1       Running   0          4m
-  blockchain-org3peer1-59b6d99c45-dhtbp   1/1       Running   0          4m
-  blockchain-org4peer1-6b6c99c45-wz9wm    1/1       Running   0          4m
-  ```
+```
+$ kubectl get pods
+NAME                                    READY     STATUS    RESTARTS   AGE
+blockchain-ca-7848c48d64-2cxr5          1/1       Running   0          4m
+blockchain-orderer-596ccc458f-thdgn     1/1       Running   0          4m
+blockchain-org1peer1-747d6bdff4-4kzts   1/1       Running   0          4m
+blockchain-org2peer1-7794d9b8c5-sn2qf   1/1       Running   0          4m
+blockchain-org3peer1-59b6d99c45-dhtbp   1/1       Running   0          4m
+blockchain-org4peer1-6b6c99c45-wz9wm    1/1       Running   0          4m
+```
 
 The script joins all peers on one channel `channel1`, install chaincode on all peers and instantiate chaincode on channel1. It means we can execute an invoke/query command on any peer and the response should be same on all peers. 
 
