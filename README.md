@@ -1,206 +1,83 @@
-*Read this in other languages: [中国](README-cn.md).*
+# Hyperledger Kubernetes For Google Kubernetes Engine
+[![Google Cloud](https://deepchains.files.wordpress.com/2017/12/hyperlegerlogo.png?w=400)](https://www.hyperledger.org)
 
-# Deploy the Blockchain network using Kubernetes APIs on Google Cloud
+[![Magic leap](https://res.cloudinary.com/dww6hce3q/image/upload/c_scale,w_235/v1578606946/Magic_Leap_jgpl4o.png)](https://www.magicleap.com) [![Magic leap](https://res.cloudinary.com/dww6hce3q/image/upload/c_scale,w_190/v1578607063/unnamed_vjsgpe.png)](http://www.kaizentek.io)
 
-*Read this in other languages: [한국어](README-ko.md).*
+[![Build Status](https://travis-ci.org/joemccann/dillinger.svg?branch=master)](https://travis-ci.org/joemccann/dillinger)
 
-Blockchain is a shared, immutable ledger for recording the history of transactions. The Linux Foundation’s Hyperledger Fabric, the software implementation of blockchain IBM is committed to, is a permissioned network. For developing any blockchain use-case, the very first thing is to have a development environment for Hyperledger Fabric to create and deploy the application. Hyperledger Fabric network can be setup in multiple ways.
-* [Hyperledger Fabric network On-Premise](https://hyperledger-fabric.readthedocs.io/en/release-1.0/build_network.html)
-* Hyperledger Fabric network using [Kubernetes APIs]((https://cloud.ibm.com/containers-kubernetes/catalog/cluster)) on 
+## Created By:
+John Radosta - [KaizenTek](http://www.kaizentek.io)
+Benjamin Beckman - [Magic Leap](http://www.magicleap.com)
 
-This code pattern demonstrates the steps involved in setting up your business network on **Hyperledger Fabric using Kubernetes APIs on Google Cloud Kubernetes Engine**.
+## Acknowledgements
+Special thank you to John Campbell & Gary Davidson and the rest of the team at Magic Leap for giving us the go-ahead to opensource this endeavor. 
 
-Hosting the Hyperledger Fabric network on Google Cloud provides you many benefits like multiple users can work on the same setup, the setup can be used for different blockchain applications, the setup can be reused and so on. Please note that the blockchain network setup on Kubernetes is good to use for demo scenarios but for production, it is recommended to use Google Cloud Platform.
+## Requirements
+You'll need to have a Kubernetes cluster running on GCP with Helm and Tiller both installed (with the proper service account and cluster role binding for tiller) For instructions on how to install Helm and Tiller, you can check out this resource.
 
-#### Kubernetes Cluster
+[Setting Up Helm & Tiller](http://docs.shippable.com/deploy/tutorial/deploy-to-gcp-gke-helm/)
 
-[IBM Cloud Kubernetes Service](https://cloud.ibm.com/containers-kubernetes/catalog/cluster) allows you to create a free cluster that comes with 2 CPUs, 4 GB memory, and 1 worker node. It allows you to get familiar with and test Kubernetes capabilities. However they lack capabilities like persistent NFS file-based storage with volumes.
+## Before You Deploy
 
-To setup your cluster for maximum availability and capacity, IBM Cloud allows you to create a fully customizable, production-ready cluster called _standard cluster_. _Standard clusters_ allow highly available cluster configurations such as a setup with two clusters that run in different regions, each with multiple worker nodes. Please see https://cloud.ibm.com/docs/containers?topic=containers-cs_ov#cluster_types to review other options for highly available cluster configurations.
+You'll need to install CouchDB as a StatefulSet running on the cluster so the peers can communicate with CouchDB as opposed to LevelDB. This allows for rich queries on JSON objects stored in CouchDB versus only primary index range and partial composite ranges. If you want to use LevelDB as the state database which does not support in-depth rich querying (simple key-value pairs only), you can skip to the Using LevelDB section. 
 
-This pattern uses a _free cluster_ provided by IBM Cloud and it can be used for proof-of-concept purpose. This pattern provides you the scripts to automate the process for setting up Hyperledger Fabric network using Kubernetes APIs on IBM Cloud.
+### Installing CouchDB (Default Deployment Setting)
 
-When the reader has completed this pattern, they will understand how to:
-
-* modify configuration files according to their network topology
-* deploy the hyperledger fabric network on Kubernetes cluster
-
-## Flow
-
-  ![](images/architecture.png)
-
-1. Log in to IBM Cloud CLI and initialize IBM Cloud Kubernetes Service plugin.
-2. Set context for Kubernetes cluster using CLI and download Kubernetes configuration files. After downloading configuration files, set KUBECONFIG environment variable.
-3. Run script to deploy your hyperledger fabric network on Kubernetes cluster.
-4. Access Kubernetes dashboard.
-
-## Included components
-
-* [Hyperledger Fabric](https://hyperledger-fabric.readthedocs.io/): Hyperledger Fabric is a platform for distributed ledger solutions underpinned by a modular architecture delivering high degrees of confidentiality, resiliency, flexibility and scalability.
-
-* [IBM Cloud Kubernetes Service](https://cloud.ibm.com/containers-kubernetes/catalog/cluster): IBM Kubernetes Service enables the orchestration of intelligent scheduling, self-healing, and horizontal scaling.
-
-## Featured technologies
-
-* [Blockchain](https://en.wikipedia.org/wiki/Blockchain): A blockchain is a digitized, decentralized, public ledger of all transactions in a network.
-
-* [Kubernetes Cluster](https://kubernetes.io/docs/home/): In Kubernetes Engine, a container cluster consists of at least one cluster master and multiple worker machines called nodes. A container cluster is the foundation of Kubernetes Engine.
-
-## Watch the Video
-
-[![](https://img.youtube.com/vi/DFYk6XaMHc0/0.jpg)](https://youtu.be/DFYk6XaMHc0)
-
-## Kubernetes Concepts Used
-* [Kubernetes Pods](https://kubernetes.io/docs/concepts/workloads/pods/pod/) - Pods represent the smallest deployable units in a Kubernetes cluster and are used to group containers that must be treated as a single unit.
-* [Kubernetes Jobs](https://kubernetes.io/docs/concepts/workloads/controllers/jobs-run-to-completion/) - A job creates one or more pods and ensures that a specified number of them successfully terminate. As pods successfully complete, the job tracks the successful completions.
-* [Kubernetes Deployment](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/) - A deployment is a Kubernetes resource where you specify your containers and other Kubernetes resources that are required to run your app, such as persistent storage, services, or annotations.
-* [Kubernetes Services](https://kubernetes.io/docs/concepts/services-networking/service/) - A Kubernetes service groups a set of pods and provides network connection to these pods for other services in the cluster without exposing the actual private IP address of each pod.
-* [Kubernetes Persistent Volumes (PV)](https://kubernetes.io/docs/concepts/storage/persistent-volumes/) - PersistentVolumes are a way for users to *claim* durable storage such as NFS file storage.
-
-### Prerequisites
-
-- [IBM Cloud account](https://cloud.ibm.com/registration/?target=%2Fdashboard%2Fapps)
-- [Node v8.x or greater and npm v5.x or greater](https://nodejs.org/en/download/)
-
-
-## Steps
-
-Follow these steps to setup and run this code pattern.
-
-1. [Create a Kubernetes Cluster on IBM Cloud](#1-create-a-kubernetes-cluster-on-ibm-cloud)
-2. [Setting up CLIs](#2-setting-up-clis)
-3. [Gain access to your Kubernetes Cluster](#3-gain-access-to-your-kubernetes-cluster)
-4. [Deploy Hyperledger Fabric Network into Kubernetes Cluster](#4-deploy-hyperledger-fabric-network-into-kubernetes-cluster)
-5. [Test the deployed network](#5-test-the-deployed-network)
-6. [View the Kubernetes Dashboard](#6-view-the-kubernetes-dashboard)
-7. [Connect the network using client SDK](#7-connect-the-network-using-client-sdk)
-
-### 1. Create a Kubernetes Cluster on IBM Cloud
-
-* Create a Kubernetes cluster with [IBM Cloud Kubernetes Service](https://cloud.ibm.com/containers-kubernetes/catalog/cluster) using GUI. This pattern uses the _free cluster_.
-
-  ![](images/create-service.png)
-
-  Note: It can take up to 15 minutes for the cluster to be set up and provisioned.
-
-
-### 2. Setting up CLIs
-
-* Install [IBM Cloud CLI](https://cloud.ibm.com/docs/cli?topic=cloud-cli-install-ibmcloud-cli). The prefix for running commands by using the Bluemix CLI is `ibmcloud`.
-
-* Install [Kubernetes CLI](https://kubernetes.io/docs/tasks/tools/install-kubectl/). The prefix for running commands by using the Kubernetes CLI is `kubectl`.
-
-* Install the kubernetes service plugin using the following command
-`ibmcloud plugin install container-service -r Bluemix`
-
-
-### 3. Gain access to your Kubernetes Cluster
-
-  Access the [IBM Cloud Dashboard](https://cloud.ibm.com/dashboard/apps).  Choose the same cloud foundry org and cloud
-  foundry space where cluster is created.
-
-  * Check the status of your cluster `IBM Cloud Dashboard -> <your cluster> -> Worker Nodes`. If status is not `normal`, then
-    you need to wait for some more time to proceed further.
-
-    ![](images/cluster-status.png)
-
-  * Once your cluster is ready, open the access tab `IBM Cloud Dashboard -> <your cluster> -> Access` as shown in snapshot.
-
-    ![](images/gain-access-to-cluster.png)
-
-  * Perform the steps provided under the section `Gain access to your cluster`.
-
-  * Verify that the kubectl commands run properly with your cluster by checking the Kubernetes CLI server version.
-
+1. Create a kubernetes secret, replace the values in quotes with your own values:
+    ```sh
+    $ kubectl create secret generic my-release-couchdb --from-literal=adminUsername=(USERNAME) --from-literal=adminPassword=(PASSWORD) --from-literal=cookieAuthSecret=(SECRET)
     ```
-    $ kubectl version  --short
-    Client Version: v1.9.2
-    Server Version: v1.8.6-4+9c2a4c1ed1ee7e
+2. Add the CouchDB Helm Repo:
+    ```sh
+    $ helm repo add couchdb https://apache.github.io/couchdb-helm
     ```
+    
+3. Create a V-4 UUID at https://www.uuidgenerator.net/
 
-### 4. Deploy Hyperledger Fabric Network into Kubernetes Cluster
-
-#### Understand the network topology
-
-This pattern provides a script which automatically provisions a sample Hyperledger Fabric network consisting of four organizations, each maintaining one peer node, and a 'solo' ordering service. Also, the script creates a channel named as `channel1`, joins all peers to the channel `channel1`, install chaincode on all peers and instantiate chaincode on channel. The pattern also helps to drive execution of transactions against the deployed chaincode.
-
-#### Copy Kubernetes configuration scripts
-
-Clone or download the Kubernetes configuration scripts to your user home directory.
-  ```
-  $ git clone https://github.com/IBM/blockchain-network-on-kubernetes
-  ```
-
-Navigate to the source directory
-  ```
-  $ cd blockchain-network-on-kubernetes
-  $ ls
-  ```
-In the source directory,
-  * `configFiles` contains Kubernetes configuration files
-  * `artifacts` contains the network configuration files
-  * `*.sh` scripts to deploy and delete the network
-
-#### Modify the Kubernetes configuration scripts
-
-If there is any change in network topology, need to modify the configuration files (.yaml files) appropriately. The configuration files are located in `artifacts` and `configFiles` directory. For example, if you decide to increase/decrease the capacity of persistent volume then you need to modify `createVolume.yaml`.
-
-If the Kubernetes' Server version is **v1.11.x** or above, the cluster may be using `containerd` as its container runtime therefore using `docker.sock` of the worker node is not possible. You could deploy and use a Docker daemon in a container.
-> In IKS v1.11.x and above, it is using `containerd`
-
-Modify the `configFiles/peersDeployment.yaml` file to point to a Docker service. Change instances of `unix:///host/var/run/docker.sock` to `tcp://docker:2375` with a text editor or use the commands below.
+4. Install CouchDB w/ Helm, replace the (YOUR_UUID) with your custom value:
+    ```sh
+    $ helm install \
+      --name my-release \
+      --set createAdminSecret=false \
+      --set allowAdminParty=true \
+      --set couchdbConfig.couchdb.uuid=(YOUR_UUID) \
+      --set persistentVolume.enabled=true \
+      --set persistentVolume.size=50Gi \
+      couchdb/couchdb
+    ```
+    
+### To Use LevelDB 
+Change the CORE_LEDGER_STATE_STATEDATABASE environment variable to LevelDB for each of the four peers in "configFiles/peersDeployment.yaml":
 
 ```
-## macOS
-$ sed -i '' s#unix:///host/var/run/docker.sock#tcp://docker:2375# configFiles/peersDeployment.yaml
-
-## Linux
-$ sed -i s#unix:///host/var/run/docker.sock#tcp://docker:2375# configFiles/peersDeployment.yaml
+- name: CORE_LEDGER_STATE_STATEDATABASE
+          value: LevelDB 
 ```
 
-#### Run the script to deploy your Hyperledger Fabric Network
+## Organizations Configuration
+All the configuration for each peer organization can be found and configured to your liking in artifacts/configtx.yaml and artifacts/crypto-config.yaml
 
-Once you have completed the changes (if any) in configuration files, you are ready to deploy your network. 
+## Installation
 
-Check your kubectl CLI version as:
-
-```
-$ kubectl version --short
-```
-
-This command will give you `Client Version` and `Server Version`. 
-If the `Client version > v1.11.x` i.e. 1.12.x or more then use `setup_blockchainNetwork_v2.sh` to set up the network. Run the following command:
+Make sure you have your cluster credentials handed to kubectl using the command:
 
 ```
-cp setup_blockchainNetwork_v2.sh setup_blockchainNetwork.sh
+$ gcloud container clusters get-credentials CLUSTER_NAME --region REGION
 ```
 
-If the `Client version <= v1.11.x` then use `setup_blockchainNetwork_v1.sh` to setup the network. Copy the script as shown.
+Run the setup_blockchainNetwork.sh script, this will automatically created a network file server on Kubernetes backed by a persistent disk. This is needed for the peers to be able to write to the same shared disk (ReadWriteMany is not available to persistent volumes on kubernetes engine, Hyperledger requires this). 
+
 ```
-cp setup_blockchainNetwork_v1.sh setup_blockchainNetwork.sh
+$ ./setup_blockchainNetwork.sh
 ```
 
-Now execute the script to deploy your hyperledger fabric network.
+Let the script run, if you run into any issues, just run the deleteNetwork.sh script and re-run the deploy script.
 
-  ```
-  $ chmod +x setup_blockchainNetwork.sh
-  $ ./setup_blockchainNetwork.sh
-  ```
+```
+$ ./deleteNetwork.sh
+```
 
-  > If you are using a Standard IKS cluster with multiple workers nodes, do `./setup_blockchainNetwork.sh --paid` so that the shared volume of the blockchain containers would work properly.
-
-Note: Before running the script, please check your environment. You should able to run `kubectl commands` properly with your cluster as explained in step 3.
-
-#### Delete the network
-
-If required, you can bring your hyperledger fabric network down using the script `deleteNetwork.sh`. This script will delete all your pods, jobs, deployments etc. from your Kubernetes cluster.
-
-  ```
-  $ chmod +x deleteNetwork.sh
-  $ ./deleteNetwork.sh
-  ```
-
-### 5. Test the deployed network
+## Test The deployed network
 
 After successful execution of the script `setup_blockchainNetwork.sh`, check the status of pods.
 
@@ -215,12 +92,14 @@ After successful execution of the script `setup_blockchainNetwork.sh`, check the
   blockchain-org4peer1-6b6c99c45-wz9wm    1/1       Running   0          4m
   ```
 
-As mentioned above, the script joins all peers on one channel `channel1`, install chaincode on all peers and instantiate chaincode on channel. It means we can execute an invoke/query command on any peer and the response should be same on all peers. Please note that in this pattern tls certs are disabled to avoid complexity. In this pattern, the CLI commands are used to test the network. For running a query against any peer, need to get into a bash shell of a peer, run the query and exit from the peer container.
+The script joins all peers on one channel `channel1`, install chaincode on all peers and instantiate chaincode on channel1. It means we can execute an invoke/query command on any peer and the response should be same on all peers. 
 
-Use the following command to get into a bash shell of a peer:
+Please note that in this pattern tls certs are disabled to avoid complexity. In this pattern, the CLI commands are used to test the network. For running a query against any peer, you need to get into a bash shell of a peer, run the query and exit from the peer container.
+
+Use the following command to get into a shell of a peer:
 
   ```
-  $ kubectl exec -it <blockchain-org1peer1 pod name> bash
+  $ kubectl exec -it <blockchain-org1peer1 pod name> sh
   ```
 
 And the command to be used to exit from the peer container is:
@@ -229,79 +108,40 @@ And the command to be used to exit from the peer container is:
   # exit
   ```
 
-**Note:** Stay logged into your peer to complete these commands.
 
-**Query**
+## Chaincode Deployment Example (Golang)
+Instead of manually installing and updating chaincode on each peer, there is an example chaincode with K8s job templates that will deploy chaincode with any CI/CD tool of your choice. To deploy the sample chaincode:
 
-Chaincode was instantiated with the values as `{ a: 100, b: 200 }`. Let’s query to `org1peer1` for the value of `a` to make sure the chaincode was properly instantiated.
+Note: Your CI/CD system will need to have a service account activated with sufficient privileges to deploy to your K8s cluster: 
 
-  ![](images/first-query.png)
+### Chaincode Deployer Continuous Integration/Deployment Instructions:
+We needed to create a way that allowed us to continuously deploy and upgrade chaincode in an enterprise setting, so we created a series of sequential Kubernetes jobs that automatically install, instantiates, and upgrades chaincode from a single script. 
 
-**Invoke**
+The Chaincode Deployer (chaincode_deployer directory) should be separated into its own repo if you're going to use it as your chaincode model. Then you can just use whatever CI/CD tooling you'd like to run the deploy.sh script in the chaincode_deployer directory. Below is a step by step usage guide, there is an example chaincode for a simple asset that you can run to test how it works. 
 
-Now let’s submit a request to `org2peer1` to move 20 from `a` to `b`. A new transaction will be generated and upon successful completion of transaction, state will get updated.
+1) Write  your chaincode in 'chaincode_deployer/chaincode/' directory. All your code must be scoped to 'package main' or you will get $GOPATH errors in your peer when the install job runs.
 
-  ![](images/invoke.png)
+2) In 'chaincode_deployer/chaincode/k8s/chaincode_config.template', give your chaincode a name, a version number and an initial key-value state under the "data" section of the template file. IMPORTANT: You will need to increment the chaincode-version number everytime you are upgrading your chaincode, or both the upgrade and instantiate chaincode jobs will fail. 
 
-**Query**
+3) Have your CI/CD system run the ./deploy.sh script in the chaincode_deployer directory. That's it!
 
-Let’s confirm that our previous invocation executed properly. We initialized the key `a` with a value of 100 and just removed 20 with our previous invocation. Therefore, a query against `a` should show 80 and a query against `b` should show 220. Now issue the query request to `org3peer1` and `org4peer1` as shown.
+The chaincode deploy script will sequentially create Kubernetes jobs to install and then either instantiate or upgrade your chaincode. First, it will try to upgrade any chaincode of the same name you're deploying, and if that job fails, it will automatically failover to instantiating a new chaincode. 
 
-  ![](images/second-query.png)
+Hyperledger for Google Kubernetes Engine uses a number of technologies to work properly:
 
-  ![](images/third-query.png)
+* [Google Cloud] - Google's cloud service 
+* [Kubernetes Engine] - Container orchestration engine
+* [Hyperledger Fabric] - Private enterprise blockchain built on Raft protocol 
+* [CouchDB] - JSON document storage database
+* [Golang] - Golang is a statically typed, compiled programming language designed at Google
 
-### 6. View the Kubernetes Dashboard
-
-Go to the `IBM Cloud dashboard -> Kubernetes Cluster -> <Your cluster>` 
-
-Click on the button entitled `Kubernetes Dashboard`, 
-
-![](images/kdashboardonibmcloud.png)
-
-you will see the dashboard as shown.
-
-![](images/kubernetes-dashboard.png)
-
-The hyperledger fabric network is ready to use. You can start developing your blockchain applications using node sdk for this deployed network.
-
-### 7. Connect the network using client SDK
-
-To develop your blockchain application on this deployed network, you need to connect to this network using client SDK. To connect to the network:
-
-* Get the public IP of your kubernetes cluster from IBM Cloud Dashboard.
-* Connect using this public IP and the ports exposed using [services](https://github.com/IBM/blockchain-network-on-kubernetes/blob/master/configFiles/blockchain-services.yaml).
-For example: The node port for CA is `30054` hence CA Client url will be `http://< public IP of your cluster >:30054/`
-
-In this way, the CA client using node SDK can be created as:
-
-  ```
-  fabric_ca_client = new Fabric_CA_Client('http://< public IP of your cluster >:30054/', tlsOptions , 'CA1', crypto_suite);
-  ```
-Similarly the following code can be used to setup the fabric network.
-
-  ```
-  // setup the fabric network
-  var fabric_client = new Fabric_Client();
-
-  var channel = fabric_client.newChannel('channel1');
-  var peer = fabric_client.newPeer('grpc://< public IP of your cluster >:30110');
-  channel.addPeer(peer);
-  var order = fabric_client.newOrderer('grpc://< public IP of your cluster >:31010')
-  channel.addOrderer(order);
-  ```
-
-## Troubleshooting
-
-[See DEBUGGING.md.](DEBUGGING.md)
-
-## Reference Links
-
-* [Hyperledger Fabric](https://hyperledger-fabric.readthedocs.io/en/release-1.1/)
-* [Kubernetes Concepts](https://kubernetes.io/docs/concepts/)
+   [Hyperledger Fabric]: <https://www.hyperledger.org>
+   [Google Cloud]: <https://cloud.google.com>
+   [Kubernetes Engine]: <http://kubernetes.io>
+   [CouchDB]: <http://couchdb.apache.org>
+   [Golang]: <http://www.golang.org>
 
 ## License
-
 This code pattern is licensed under the Apache Software License, Version 2.  Separate third party code objects invoked within this code pattern are licensed by their respective providers pursuant to their own separate licenses. Contributions are subject to the [Developer Certificate of Origin, Version 1.1 (DCO)](https://developercertificate.org/) and the [Apache Software License, Version 2](https://www.apache.org/licenses/LICENSE-2.0.txt).
 
 [Apache Software License (ASL) FAQ](https://www.apache.org/foundation/license-faq.html#WhatDoesItMEAN)
