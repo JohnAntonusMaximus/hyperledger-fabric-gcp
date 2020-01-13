@@ -25,16 +25,20 @@ You'll need to install CouchDB as a StatefulSet running on the cluster so the pe
 ### Installing CouchDB (Default Deployment Setting)
 
 1. Create a kubernetes secret, replace the values in quotes with your own values:
-    ```sh
+
+    ```
     $ kubectl create secret generic cluster-couchdb --from-literal=adminUsername=(YOUR_USERNAME) --from-literal=adminPassword=(YOUR_PASSWORD) --from-literal=cookieAuthSecret=(YOUR_PASSWORD)
     ```
+
 2. Add the CouchDB Helm Repo:
-    ```sh
+
+    ```
     $ helm repo add couchdb https://apache.github.io/couchdb-helm
     ```
 
 3. Install CouchDB w/ Helm, replace the (YOUR_) fileds with your custom values that you set above, but DO NOT change the release name:
-    ```sh
+
+    ```
     $ helm install \
       --name cluster \
       --set createAdminSecret=false \
