@@ -27,7 +27,10 @@ You'll need to install CouchDB as a StatefulSet running on the cluster so the pe
 1. Create a kubernetes secret, replace the values in quotes with your own values:
 
     ```
-    $ kubectl create secret generic cluster-couchdb --from-literal=adminUsername=(YOUR_USERNAME) --from-literal=adminPassword=(YOUR_PASSWORD) --from-literal=cookieAuthSecret=(YOUR_PASSWORD)
+    $ kubectl create secret generic cluster-couchdb \
+      --from-literal=adminUsername=(YOUR_USERNAME) \
+      --from-literal=adminPassword=(YOUR_PASSWORD) \
+      --from-literal=cookieAuthSecret=(YOUR_PASSWORD)
     ```
 
 2. Add the CouchDB Helm Repo:
