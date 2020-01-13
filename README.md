@@ -27,10 +27,10 @@ You'll need to install CouchDB as a StatefulSet running on the cluster so the pe
 1. Create a kubernetes secret, replace the values in quotes with your own values:
 
     ```
-    $ kubectl create secret generic cluster-couchdb \  
-      --from-literal=adminUsername=(YOUR_USERNAME) \  
-      --from-literal=adminPassword=(YOUR_PASSWORD) \  
-      --from-literal=cookieAuthSecret=(YOUR_PASSWORD)  
+    $ kubectl create secret generic cluster-couchdb \<br/>  
+      --from-literal=adminUsername=(YOUR_USERNAME) \ <br/> 
+      --from-literal=adminPassword=(YOUR_PASSWORD) \ <br/> 
+      --from-literal=cookieAuthSecret=(YOUR_PASSWORD) <br/> 
     ```
 
 2. Add the CouchDB Helm Repo:
@@ -42,15 +42,15 @@ You'll need to install CouchDB as a StatefulSet running on the cluster so the pe
 3. Install CouchDB w/ Helm, replace the (YOUR_) fileds with your custom values that you set above, but DO NOT change the release name:
 
     ```
-    $ helm install \
-      --name cluster \  
-      --set createAdminSecret=false \  
-      --set adminUsername=(YOUR_USERNAME) \  
-      --set adminPassword=(YOUR_PASSWORD) \  
-      --set cookieAuthSecret=(YOUR_PASSWORD) \  
-      --set couchdbConfig.couchdb.uuid=$(curl https://www.uuidgenerator.net/api/version4 2>/dev/null | tr -d -) \  
-      --set persistentVolume.enabled=true \  
-      --set persistentVolume.size=50Gi \  
+    $ helm install \<br/>
+      --name cluster \<br/>
+      --set createAdminSecret=false \<br/>  
+      --set adminUsername=(YOUR_USERNAME) \<br/>  
+      --set adminPassword=(YOUR_PASSWORD) \<br/> 
+      --set cookieAuthSecret=(YOUR_PASSWORD) \<br/>  
+      --set couchdbConfig.couchdb.uuid=$(curl https://www.uuidgenerator.net/api/version4 2>/dev/null | tr -d -) \<br/>  
+      --set persistentVolume.enabled=true \<br/>  
+      --set persistentVolume.size=50Gi \<br/>  
       couchdb/couchdb  
     ```
     
