@@ -1,5 +1,11 @@
 #!/bin/bash
 
+if [ $# -eq 0 ]
+  then
+    echo "Please provide your GCP zone for deployment as a first argument. See docs for an example."
+    exit
+fi
+
 if [ -d "${PWD}/configFiles" ]; then
     KUBECONFIG_FOLDER=${PWD}/configFiles
 else
@@ -11,9 +17,11 @@ fi
 if [ "$(gcloud compute disks list | grep nfs-disk)" ]; then
     echo "NFS Disk Exists!"
 else
-    echo "Disk is not found."
-    gcloud compute disks create --size=30GB --zone=us-east1-c --type=pd-ssd nfs-disk
+    echo "Disk is not found. Creating disk..."
+    gcloud compute disks create --size=30GB --zone=$1 --type=pd-ssd nfs-disk
+    sleep 7
     kubectl create -f ${KUBECONFIG_FOLDER}/nfs-server-deployment.yaml
+    sleep 2
     kubectl create -f ${KUBECONFIG_FOLDER}/nfs-clusterip-service.yaml
 fi
 
@@ -30,7 +38,7 @@ if [ "$(cat ${KUBECONFIG_FOLDER}/peersDeployment.yaml | grep -c tcp://docker:237
     dockerPodStatus=$(kubectl get pods --selector=name=docker --output=jsonpath={.items..phase})
 
     while [ "${dockerPodStatus}" != "Running" ]; do
-        echo "Wating for Docker container to run. Current status of Docker is ${dockerPodStatus}"
+        echo "Waiting for Docker container to run. Current status of Docker is ${dockerPodStatus}"
         sleep 5;
         if [ "${dockerPodStatus}" == "Error" ]; then
             echo "There is an error in the Docker pod. Please check logs."
@@ -69,7 +77,7 @@ pod=$(kubectl get pods --selector=job-name=copyartifacts --output=jsonpath={.ite
 podSTATUS=$(kubectl get pods --selector=job-name=copyartifacts --output=jsonpath={.items..phase})
 
 while [ "${podSTATUS}" != "Running" ]; do
-    echo "Wating for container of copy artifact pod to run. Current status of ${pod} is ${podSTATUS}"
+    echo "Waiting for container of copy artifact pod to run. Current status of ${pod} is ${podSTATUS}"
     sleep 5;
     if [ "${podSTATUS}" == "Error" ]; then
         echo "There is an error in copyartifacts job. Please check logs."

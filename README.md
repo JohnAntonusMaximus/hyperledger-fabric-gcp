@@ -26,22 +26,22 @@ You'll need to install CouchDB as a StatefulSet running on the cluster so the pe
 
 1. Create a kubernetes secret, replace the values in quotes with your own values:
     ```sh
-    $ kubectl create secret generic my-release-couchdb --from-literal=adminUsername=(USERNAME) --from-literal=adminPassword=(PASSWORD) --from-literal=cookieAuthSecret=(SECRET)
+    $ kubectl create secret generic cluster-couchdb --from-literal=adminUsername=(YOUR_USERNAME) --from-literal=adminPassword=(YOUR_PASSWORD) --from-literal=cookieAuthSecret=(YOUR_PASSWORD)
     ```
 2. Add the CouchDB Helm Repo:
     ```sh
     $ helm repo add couchdb https://apache.github.io/couchdb-helm
     ```
-    
-3. Create a V-4 UUID at https://www.uuidgenerator.net/
 
-4. Install CouchDB w/ Helm, replace the (YOUR_UUID) with your custom value:
+3. Install CouchDB w/ Helm, replace the (YOUR_) fileds with your custom values that you set above, but DO NOT change the release name:
     ```sh
     $ helm install \
-      --name my-release \
+      --name cluster \
       --set createAdminSecret=false \
-      --set allowAdminParty=true \
-      --set couchdbConfig.couchdb.uuid=(YOUR_UUID) \
+      --set adminUsername=(YOUR_USERNAME) \
+      --set adminPassword=(YOUR_PASSWORD) \
+      --set cookieAuthSecret=(YOUR_PASSWORD) \
+      --set couchdbConfig.couchdb.uuid=$(curl https://www.uuidgenerator.net/api/version4 2>/dev/null | tr -d -) \
       --set persistentVolume.enabled=true \
       --set persistentVolume.size=50Gi \
       couchdb/couchdb
@@ -60,22 +60,24 @@ All the configuration for each peer organization can be found and configured to 
 
 ## Installation
 
+NOTE: You will need to set your zone/region to us-east1-b for the installation to run correctly, if you want to launch the network in a cluster operating in another region, you'll need to replace all values of us-east1-b to whatever region you are using.
+
 Make sure you have your cluster credentials handed to kubectl using the command:
 
 ```
 $ gcloud container clusters get-credentials CLUSTER_NAME --region REGION
 ```
 
-Run the setup_blockchainNetwork.sh script, this will automatically created a network file server on Kubernetes backed by a persistent disk. This is needed for the peers to be able to write to the same shared disk (ReadWriteMany is not available to persistent volumes on kubernetes engine, Hyperledger requires this). 
+Run the setup_blockchainNetwork.sh script with the zone of your kubernetes cluster as an argument (this is required). The script will automatically created a network file server on Kubernetes backed by a persistent disk. This is needed for the peers to be able to write to the same shared disk. 
 
 ```
-$ ./setup_blockchainNetwork.sh
+$ ./setup_blockchainNetwork.sh us-east1-b
 ```
 
-Let the script run, if you run into any issues, just run the deleteNetwork.sh script and re-run the deploy script.
+Let the script run, if you run into any issues, just run the deleteNetwork.sh script and re-run the deploy script. Again, you'll need to pass the GCP zone your cluster is deployed in as an argument. If you run into an error deleting the nfs-disk, then just run the delete script twice. 
 
 ```
-$ ./deleteNetwork.sh
+$ ./deleteNetwork.sh us-east1-b
 ```
 
 ## Test The deployed network

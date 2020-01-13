@@ -1,3 +1,10 @@
+if [ $# -eq 0 ]
+  then
+    echo "Please provide your GCP zone as a first argument. See docs for an example."
+    exit
+fi
+
+
 KUBECONFIG_FOLDER=${PWD}/configFiles
 
 kubectl delete -f ${KUBECONFIG_FOLDER}/chaincode_instantiate.yaml
@@ -20,7 +27,7 @@ kubectl delete --ignore-not-found=true -f ${KUBECONFIG_FOLDER}/docker-volume.yam
 kubectl delete -f ${KUBECONFIG_FOLDER}/nfs-server-deployment.yaml
 kubectl delete -f ${KUBECONFIG_FOLDER}/nfs-clusterip-service.yaml
 
-gcloud compute disks delete nfs-disk -q --zone=us-east1-c
+gcloud compute disks delete nfs-disk -q --zone=$1
 
 sleep 15
 
