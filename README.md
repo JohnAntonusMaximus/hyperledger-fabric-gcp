@@ -39,9 +39,9 @@ You'll need to install CouchDB as a StatefulSet running on the cluster so the pe
 3. Install CouchDB w/ Helm, replace the (YOUR_) fileds with your custom values that you set above, but DO NOT change the release name:
 
 
-   ```
-    $ helm install --name cluster --set createAdminSecret=false --set adminUsername=(YOUR_USERNAME) --set adminPassword=(YOUR_PASSWORD) --set cookieAuthSecret=(YOUR_PASSWORD) --set couchdbConfig.couchdb.uuid=$(curl https://www.uuidgenerator.net/api/version4 2>/dev/null | tr -d -) --set persistentVolume.enabled=true --set persistentVolume.size=50Gi couchdb/couchdb  
-   ```
+    ```
+      $ helm install --name cluster --set createAdminSecret=false --set adminUsername=(YOUR_USERNAME) --set adminPassword=(YOUR_PASSWORD) --set cookieAuthSecret=(YOUR_PASSWORD) --set couchdbConfig.couchdb.uuid=$(curl https://www.uuidgenerator.net/api/version4 2>/dev/null | tr -d -) --set persistentVolume.enabled=true --set persistentVolume.size=50Gi couchdb/couchdb  
+    ```
     
 ### To Use LevelDB 
 Change the CORE_LEDGER_STATE_STATEDATABASE environment variable to LevelDB for each of the four peers in "configFiles/peersDeployment.yaml":
