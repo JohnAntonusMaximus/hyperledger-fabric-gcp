@@ -41,6 +41,7 @@ You'll need to install CouchDB as a StatefulSet running on the cluster so the pe
 
 3. Install CouchDB w/ Helm, replace the (YOUR_) fileds with your custom values that you set above, but DO NOT change the release name:
 
+
    ```
     $ helm install \
       --name cluster \  
@@ -129,11 +130,11 @@ We needed to create a way that allowed us to continuously deploy and upgrade cha
 
 The Chaincode Deployer (chaincode_deployer directory) should be separated into its own repo for each chaincode you plan to deploy (chaincode.go). Then you can just use whatever CI/CD tooling you'd like to run the deploy.sh script in the chaincode_deployer directory. Below is a step by step usage guide, there is an example chaincode for a simple asset that you can run to test how it works. 
 
-    1) Write  your chaincode in 'chaincode_deployer/chaincode/' directory. All your code must be scoped to 'package main' or you will get $GOPATH errors in your peer when the install job runs.
+1. Write  your chaincode in 'chaincode_deployer/chaincode/' directory. All your code must be scoped to 'package main' or you will get $GOPATH errors in your peer when the install job runs.
 
-    2) In 'chaincode_deployer/chaincode/k8s/chaincode_config.template', give your chaincode a name, a version number and an initial key-value state under the "data" section of the template file. IMPORTANT: You will need to increment the chaincode-version number everytime you are upgrading your chaincode, or both the upgrade and instantiate chaincode jobs will fail. 
+2. In 'chaincode_deployer/chaincode/k8s/chaincode_config.template', give your chaincode a name, a version number and an initial key-value state under the "data" section of the template file. IMPORTANT: You will need to increment the chaincode-version number everytime you are upgrading your chaincode, or both the upgrade and instantiate chaincode jobs will fail. 
 
-    3) Have your CI/CD system run the ./deploy.sh script in the chaincode_deployer directory. That's it!
+3. Have your CI/CD system run the ./deploy.sh script in the chaincode_deployer directory. That's it!
 
 The chaincode deploy script will sequentially create Kubernetes jobs to install and then either instantiate or upgrade your chaincode. First, it will try to upgrade any chaincode of the same name you're deploying, and if that job fails, it will automatically failover to instantiating a new chaincode. 
 
