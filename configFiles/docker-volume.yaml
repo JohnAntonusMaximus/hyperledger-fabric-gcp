@@ -1,0 +1,31 @@
+---
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: docker-pv
+  labels:
+    name: dockervolume
+spec:
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteMany
+  nfs:
+    server: nfs-server.default.svc.cluster.local
+    path: "/"
+
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: docker-pvc
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: ""
+  selector:
+    matchLabels:
+      name: dockervolume
