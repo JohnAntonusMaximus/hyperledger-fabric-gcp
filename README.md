@@ -1,9 +1,7 @@
 # Hyperledger Kubernetes For Google Kubernetes Engine
-[![Google Cloud](https://deepchains.files.wordpress.com/2017/12/hyperlegerlogo.png?w=400)](https://www.hyperledger.org)
+[![Hyperledger](https://deepchains.files.wordpress.com/2017/12/hyperlegerlogo.png?w=400)](https://www.hyperledger.org)
 
-[![Magic leap](https://res.cloudinary.com/dww6hce3q/image/upload/c_scale,w_235/v1578606946/Magic_Leap_jgpl4o.png)](https://www.magicleap.com) [![Magic leap](https://res.cloudinary.com/dww6hce3q/image/upload/c_scale,w_190/v1578607063/unnamed_vjsgpe.png)](http://www.kaizentek.io)
-
-[![Build Status](https://travis-ci.org/joemccann/dillinger.svg?branch=master)](https://travis-ci.org/joemccann/dillinger)
+[![Build Status](https://travis-ci.org/joemccann/dillinger.svg?branch=master)](https://www.kaizentek.io)
 
 ## Created By:
 John Radosta - [KaizenTek](http://www.kaizentek.io)
