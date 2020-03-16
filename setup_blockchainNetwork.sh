@@ -23,30 +23,9 @@ else
     kubectl create -f ${KUBECONFIG_FOLDER}/nfs-server-deployment.yaml
     sleep 2
     kubectl create -f ${KUBECONFIG_FOLDER}/nfs-clusterip-service.yaml
+    echo "Disk creation complete!"
 fi
 
-
-# Create Docker deployment
-if [ "$(cat ${KUBECONFIG_FOLDER}/peersDeployment.yaml | grep -c tcp://docker:2375)" != "0" ]; then
-    echo "peersDeployment.yaml file was configured to use Docker in a container."
-    echo "Creating Docker deployment"
-
-    kubectl create -f ${KUBECONFIG_FOLDER}/docker-volume.yaml
-    kubectl create -f ${KUBECONFIG_FOLDER}/docker.yaml
-    sleep 5
-
-    dockerPodStatus=$(kubectl get pods --selector=name=docker --output=jsonpath={.items..phase})
-
-    while [ "${dockerPodStatus}" != "Running" ]; do
-        echo "Waiting for Docker container to run. Current status of Docker is ${dockerPodStatus}"
-        sleep 5;
-        if [ "${dockerPodStatus}" == "Error" ]; then
-            echo "There is an error in the Docker pod. Please check logs."
-            exit 1
-        fi
-        dockerPodStatus=$(kubectl get pods --selector=name=docker --output=jsonpath={.items..phase})
-    done
-fi
 
 # Creating Persistant Volume
 echo -e "\nCreating volume"
