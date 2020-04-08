@@ -54,8 +54,6 @@ All the configuration for each peer organization can be found and configured to 
 
 ## Installation
 
-NOTE: You will need to set your zone/region to us-east1-b for the installation to run correctly, if you want to launch the network in a cluster operating in another region, you'll need to replace all values of us-east1-b to whatever region you are using.
-
 Make sure you have your cluster credentials handed to kubectl using the command:
 
 ```
